@@ -4,8 +4,6 @@ import { ListItem, getItem, deleteItem, addItem } from './shopping-list'
 import { save, load } from './storage'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
-let items: ListItem[] = await load()
-let list: HTMLUListElement
 let addText: HTMLInputElement
 
 function addItemForm() {
@@ -19,29 +17,27 @@ function deleteButton(id: ListItem['id']) {
   return `<button class="delete-button" data-id="${id}">✖️</button>`
 }
 
-function render() {
+function listItem(i: ListItem) {
+  return `<li data-id="${i.id}">
+  <span>📌 ${i.name} ${i.done ? '✔️' : ''}</span>
+  ${deleteButton(i.id)}
+</li>`
+}
+
+function render(items: ListItem[]) {
   app.innerHTML = `
     <ul class="list">
-      ${items
-        .map(
-          (i) =>
-            `<li data-id="${i.id}">
-              <span>📌 ${i.name} ${i.done ? '✔️' : ''}</span>
-              ${deleteButton(i.id)}
-            </li>`
-        )
-        .join('')}
+      ${items.map((i) => listItem(i)).join('')}
     </ul>
     ${addItemForm()}
   `
 
-  list = document.querySelector('ul.list')!
   addText = document.querySelector('.add-form input[type=text]')!
 
-  bindHandlers()
+  bindHandlers(items)
 }
 
-function bindHandlers() {
+function bindHandlers(items: ListItem[]) {
   document.querySelectorAll('ul.list > li').forEach((i) => {
     i.addEventListener('click', async (ev) => {
       const el = ev.currentTarget as HTMLLIElement
@@ -51,7 +47,7 @@ function bindHandlers() {
       const item = getItem(items, id)
       if (!item) return
       item.done = !item.done
-      render()
+      render(items)
       await save(items)
       return true
     })
@@ -66,7 +62,7 @@ function bindHandlers() {
       if (newItems === items) return
       items = newItems
       addText.value = ''
-      render()
+      render(items)
       await save(items)
       addText.focus()
     })
@@ -78,10 +74,16 @@ function bindHandlers() {
       const id = (ev.currentTarget as HTMLButtonElement).dataset['id']
       if (!id) return
       items = deleteItem(items, id)
-      render()
+      render(items)
       await save(items)
     })
   })
 }
 
-render()
+load()
+  .then((items) => {
+    render(items)
+  })
+  .catch((err) => {
+    console.error(err)
+  })

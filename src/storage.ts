@@ -9,6 +9,6 @@ export async function save(items: ListItem[]) {
 
 export async function load() {
   const s = window.localStorage.getItem(STORAGE_KEY) ?? '[]'
-  const items = JSON.parse(s)
+  const items = JSON.parse(s) as ListItem[]
   return items
 }
