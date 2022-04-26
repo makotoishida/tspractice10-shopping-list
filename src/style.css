@@ -72,11 +72,15 @@ ul.list li > span {
 
 .add-form {
   display: flex;
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 8px;
 }
 .add-form input[type=text] {
   flex: 1
+}
+.add-form button {
+  flex: initial;
 }
 
 .delete-button {
