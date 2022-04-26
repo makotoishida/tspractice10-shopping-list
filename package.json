@@ -2,6 +2,9 @@
   "name": "shopping-list",
   "private": true,
   "version": "0.0.0",
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,11 +12,12 @@
   },
   "devDependencies": {
     "typescript": "^4.5.4",
-    "vite": "^2.9.5"
+    "vite": "^2.9.5",
+    "vite-plugin-pwa": "^0.12.0"
   },
   "dependencies": {
     "node": "latest",
-    "npm": "latest",
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "npm": "latest"
   }
 }
