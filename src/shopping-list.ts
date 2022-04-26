@@ -4,7 +4,10 @@ export type ListItem = {
   done: boolean
 }
 
-export function getItem(items: ListItem[], id: ListItem['id']) {
+export function getItem(
+  items: ListItem[],
+  id: ListItem['id']
+): ListItem | undefined {
   return items.filter((i) => i.id === id)[0]
 }
 
@@ -21,20 +24,17 @@ export function addItem(items: ListItem[], name: ListItem['name']) {
 export function updateItem(
   items: ListItem[],
   id: ListItem['id'],
-  name: ListItem['name'],
-  done: ListItem['done']
+  update: Partial<ListItem>
 ) {
   const index = items.findIndex((i) => i.id === id)
   if (index < 0) return items
   const newItem: ListItem = {
     ...items[index],
-    name,
-    done,
+    ...update,
   }
   if (!validateItem(newItem)) return items
   return [...items.slice(0, index), newItem, ...items.slice(index + 1)]
 }
-
 
 function createItem(items: ListItem[], name: ListItem['name']) {
   const maxId = items.reduce(
@@ -49,7 +49,7 @@ function createItem(items: ListItem[], name: ListItem['name']) {
   return newItem
 }
 
-export function validateItem(item: ListItem) {
+function validateItem(item: ListItem) {
   if (!item.id) return false
   if (!item.name) return false
   return true

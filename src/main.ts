@@ -16,7 +16,7 @@ let addText: HTMLInputElement
 function addItemForm() {
   return `<form class="add-form">
     <input type="text" />
-    <button type="submit">Add</button>
+    <button type="submit" class="add-button">+</button>
   </form>`
 }
 
@@ -25,15 +25,13 @@ function deleteButton(id: ListItem['id']) {
 }
 
 function listItem(i: ListItem) {
-  return `<li data-id="${i.id}">
+  return `<li class="list-item ${i.done ? 'done' : ''}"  data-id="${i.id}">
   <span>📌 ${i.name} ${i.done ? '✔️' : ''}</span>
   ${deleteButton(i.id)}
 </li>`
 }
 
 function render() {
-  removeHandlers()
-
   app.innerHTML = `
     <ul class="list">
       ${items.map((i) => listItem(i)).join('')}
@@ -42,21 +40,16 @@ function render() {
   `
 
   addText = document.querySelector('.add-form input[type=text]')!
-
-  addHandlers()
 }
 
-async function onListItemClick(ev: Event) {
-  const el = ev.currentTarget as HTMLLIElement
+async function onListItemClick(el: HTMLElement) {
   const id = el.dataset['id']
-  console.log(id, el)
   if (!id) return
   const item = getItem(items, id)
   if (!item) return
-  items = updateItem(items, id, item.name, !item.done)
+  items = updateItem(items, id, { done: !item.done })
   render()
   await save(items)
-  return true
 }
 
 async function onAddButtonClick(ev: Event) {
@@ -71,10 +64,10 @@ async function onAddButtonClick(ev: Event) {
   addText.focus()
 }
 
-async function onDeleteButtonClick(ev: Event) {
+async function onDeleteButtonClick(ev: Event, el: HTMLElement) {
   ev.preventDefault()
   ev.stopPropagation()
-  const id = (ev.currentTarget as HTMLButtonElement).dataset['id']
+  const id = el.dataset['id']
   if (!id) return
   items = deleteItem(items, id)
   render()
@@ -82,32 +75,22 @@ async function onDeleteButtonClick(ev: Event) {
 }
 
 function addHandlers() {
-  document.querySelectorAll('ul.list > li').forEach((i) => {
-    i.addEventListener('click', onListItemClick)
-  })
+  document.addEventListener('click', (ev: Event) => {
+    const selectors = '.add-button, .delete-button, .list-item'
+    const el = (ev.target as HTMLElement).closest<HTMLElement>(selectors)
+    if (!el) return
 
-  document
-    .querySelector('.add-form button')
-    ?.addEventListener('click', onAddButtonClick)
-
-  document.querySelectorAll('.delete-button').forEach((i) => {
-    i.addEventListener('click', onDeleteButtonClick)
-  })
-}
-
-function removeHandlers() {
-  document.querySelectorAll('ul.list > li').forEach((i) => {
-    i.removeEventListener('click', onListItemClick)
-  })
-
-  document
-    .querySelector('.add-form button')
-    ?.removeEventListener('click', onAddButtonClick)
-
-  document.querySelectorAll('.delete-button').forEach((i) => {
-    i.removeEventListener('click', onDeleteButtonClick)
+    if (el.className.includes('add-button')) {
+      onAddButtonClick(ev)
+    } else if (el.className.includes('delete-button')) {
+      onDeleteButtonClick(ev, el)
+    } else if (el.className.includes('list-item')) {
+      onListItemClick(el)
+    }
   })
 }
+
+addHandlers()
 
 load()
   .then((loadedItems) => {
@@ -117,3 +100,4 @@ load()
   .catch((err) => {
     console.error(err)
   })
+
