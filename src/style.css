@@ -26,7 +26,6 @@ header h1 {
 
 main {
   color: #2c3e50;
-
 }
 
 footer {
@@ -45,6 +44,34 @@ footer a {
 
 #app {
   margin-top: 1rem;
-  text-align: center;
+  text-align: left;
   color: #2c3e50;
+  font-size: x-large;
+  line-height: 160%;
+}
+
+ul.list {
+  padding: 0.4rem 1rem;
+  list-style: none;
+}
+
+ul.list li {
+  display: flex;
+  margin: 0.4rem 0;
+  padding: 0.1rem 0.2rem;
+  border-bottom: 1px dashed #c0c0c0a0;
+  cursor: pointer;
+}
+
+ul.list li > span {
+  flex: 1;
+}
+
+.add-form {
+  display: flex;
+  width: 90vw;
+  margin: 0 auto;
+}
+.add-form input[type=text] {
+  flex: 1
 }
