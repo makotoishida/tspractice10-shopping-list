@@ -1,34 +1,12 @@
 import 'normalize.css'
 import './style.css'
-
-type ListItem = {
-  id: string
-  name: string
-  done: boolean
-}
+import { ListItem, getItem, deleteItem, addItem } from './shopping-list'
+import { save, load } from './storage'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
-
-let items: ListItem[] = [
-  { id: '1', name: 'Banana', done: false },
-  { id: '2', name: 'Milk', done: false },
-  { id: '3', name: 'Apple', done: true },
-  { id: '4', name: 'Toilet Paper', done: false },
-  { id: '5', name: 'Butter', done: true },
-  { id: '6', name: 'Coffee', done: false },
-]
-
+let items: ListItem[] = await load()
 let list: HTMLUListElement
 let addText: HTMLInputElement
-let maxId = items.length
-
-function getItemById(id: ListItem['id']) {
-  return items.filter((i) => i.id === id)[0]
-}
-
-function deleteItemById(id: ListItem['id']) {
-  items = items.filter((i) => i.id !== id)
-}
 
 function addItemForm() {
   return `<form class="add-form">
@@ -65,45 +43,45 @@ function render() {
 
 function bindHandlers() {
   document.querySelectorAll('ul.list > li').forEach((i) => {
-    i.addEventListener('click', (ev) => {
+    i.addEventListener('click', async (ev) => {
       const el = ev.currentTarget as HTMLLIElement
       const id = el.dataset['id']
       console.log(id, el)
       if (!id) return
-      const item = getItemById(id)
+      const item = getItem(items, id)
       if (!item) return
       item.done = !item.done
       render()
+      await save(items)
       return true
     })
   })
 
-  document.querySelector('.add-form button')?.addEventListener('click', () => {
-    const txt = addText.value
-    const newItem = { id: ++maxId + '', name: txt, done: false }
-    if (validateItem(newItem)) {
-      items.push(newItem)
+  document
+    .querySelector('.add-form button')
+    ?.addEventListener('click', async (ev) => {
+      ev.preventDefault()
+      const txt = addText.value
+      const newItems = addItem(items, txt)
+      if (newItems === items) return
+      items = newItems
       addText.value = ''
       render()
-    }
-    addText.focus()
-  })
+      await save(items)
+      addText.focus()
+    })
 
   document.querySelectorAll('.delete-button').forEach((i) => {
-    i.addEventListener('click', (ev) => {
+    i.addEventListener('click', async (ev) => {
+      ev.preventDefault()
       ev.stopPropagation()
       const id = (ev.currentTarget as HTMLButtonElement).dataset['id']
       if (!id) return
-      deleteItemById(id)
+      items = deleteItem(items, id)
       render()
+      await save(items)
     })
   })
-}
-
-function validateItem(item: ListItem) {
-  if (!item.id) return false
-  if (!item.name) return false
-  return true
 }
 
 render()
