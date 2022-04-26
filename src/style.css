@@ -1,8 +1,50 @@
-#app {
+*,html {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* margin: 0;
+  padding: 0; */
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+header {
+  padding: 1rem;
+  text-align: center;
+  color: blue;
+  background-color: aqua;
+}
+
+header h1 {
+  margin: 0
+}
+
+main {
+  color: #2c3e50;
+
+}
+
+footer {
+  margin-top: 4rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: small;
+  color: #fefefe;
+  background-color: #00349f;
+}
+
+footer a {
+  color: #fefefe;
+  text-decoration: none;
+}
+
+#app {
+  margin-top: 1rem;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
