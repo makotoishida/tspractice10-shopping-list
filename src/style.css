@@ -75,3 +75,15 @@ ul.list li > span {
 .add-form input[type=text] {
   flex: 1
 }
+
+.delete-button {
+  border: none;
+  background: none;
+  color: #a0a0a0a0;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+.delete-button:hover, .delete-button:active  {
+  background: #d0d0d0a0;
+  color: #0000ffff;
+}

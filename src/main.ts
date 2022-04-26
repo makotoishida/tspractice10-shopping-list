@@ -9,7 +9,7 @@ type ListItem = {
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
-const items: ListItem[] = [
+let items: ListItem[] = [
   { id: '1', name: 'Banana', done: false },
   { id: '2', name: 'Milk', done: false },
   { id: '3', name: 'Apple', done: true },
@@ -26,6 +26,10 @@ function getItemById(id: ListItem['id']) {
   return items.filter((i) => i.id === id)[0]
 }
 
+function deleteItemById(id: ListItem['id']) {
+  items = items.filter((i) => i.id !== id)
+}
+
 function addItemForm() {
   return `<form class="add-form">
     <input type="text" />
@@ -33,8 +37,8 @@ function addItemForm() {
   </form>`
 }
 
-function deleteButton() {
-  return `<button>✖️</button>`
+function deleteButton(id: ListItem['id']) {
+  return `<button class="delete-button" data-id="${id}">✖️</button>`
 }
 
 function render() {
@@ -45,7 +49,7 @@ function render() {
           (i) =>
             `<li data-id="${i.id}">
               <span>📌 ${i.name} ${i.done ? '✔️' : ''}</span>
-              ${deleteButton()}
+              ${deleteButton(i.id)}
             </li>`
         )
         .join('')}
@@ -74,18 +78,26 @@ function bindHandlers() {
     })
   })
 
-  document
-    .querySelector('.add-form button')
-    ?.addEventListener('click', (ev) => {
-      const txt = addText.value
-      const newItem = { id: ++maxId + '', name: txt, done: false }
-      if (validateItem(newItem)) {
-        items.push(newItem)
-        addText.value = ''
-        render()
-      }
-      addText.focus()
+  document.querySelector('.add-form button')?.addEventListener('click', () => {
+    const txt = addText.value
+    const newItem = { id: ++maxId + '', name: txt, done: false }
+    if (validateItem(newItem)) {
+      items.push(newItem)
+      addText.value = ''
+      render()
+    }
+    addText.focus()
+  })
+
+  document.querySelectorAll('.delete-button').forEach((i) => {
+    i.addEventListener('click', (ev) => {
+      ev.stopPropagation()
+      const id = (ev.currentTarget as HTMLButtonElement).dataset['id']
+      if (!id) return
+      deleteItemById(id)
+      render()
     })
+  })
 }
 
 function validateItem(item: ListItem) {
