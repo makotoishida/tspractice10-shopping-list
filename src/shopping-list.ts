@@ -18,6 +18,24 @@ export function addItem(items: ListItem[], name: ListItem['name']) {
   return [...items, newItem]
 }
 
+export function updateItem(
+  items: ListItem[],
+  id: ListItem['id'],
+  name: ListItem['name'],
+  done: ListItem['done']
+) {
+  const index = items.findIndex((i) => i.id === id)
+  if (index < 0) return items
+  const newItem: ListItem = {
+    ...items[index],
+    name,
+    done,
+  }
+  if (!validateItem(newItem)) return items
+  return [...items.slice(0, index), newItem, ...items.slice(index + 1)]
+}
+
+
 function createItem(items: ListItem[], name: ListItem['name']) {
   const maxId = items.reduce(
     (prev, cur) => Math.max(prev, parseInt(cur.id, 10)),
