@@ -12,6 +12,8 @@
     "vite": "^2.9.5"
   },
   "dependencies": {
+    "node": "latest",
+    "npm": "latest",
     "normalize.css": "^8.0.1"
   }
 }
