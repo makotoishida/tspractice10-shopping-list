@@ -21,9 +21,15 @@ export async function load() {
   }))
 }
 
+function twoDig(n: number) {
+  return ('0' + n).slice(-2)
+}
+
 function formatDate(d?: Date) {
   if (!d) return ''
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} 00:00:00`
+  return `${d.getFullYear()}-${twoDig(d.getMonth() + 1)}-${twoDig(
+    d.getDate()
+  )}T00:00:00`
 }
 
 function parseDate(s: string) {
