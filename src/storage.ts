@@ -1,4 +1,3 @@
-import { doesNotMatch } from 'assert'
 import { ListItem } from './shopping-list'
 
 const STORAGE_KEY = 'items'
