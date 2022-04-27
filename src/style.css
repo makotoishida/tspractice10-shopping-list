@@ -72,12 +72,35 @@ ul.list li.done {
   color: #999;
 }
 
-ul.list li > span {
+ul.list li > span.name {
   flex: 1;
   font-weight: bold;
   overflow-wrap: break-word;
   overflow-x: hidden;
 }
+
+ul.list li > span.doneat {
+  flex: initial;
+  min-width: 3rem;
+  text-align: center;
+  font-size: medium;
+  font-weight: bold;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+}
+
+ul.list li .delete-button {
+  border: none;
+  background: none;
+  color: #a0a0a0a0;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+ul.list li .delete-button:hover, .delete-button:active  {
+  background: #d0d0d0a0;
+  color: #0000ffff;
+}
+
 
 .add-form {
   display: flex;
@@ -98,17 +121,5 @@ ul.list li > span {
   color: #fff;
   background-color: #0044ffe0;
   cursor: pointer;
-}
-
-.delete-button {
-  border: none;
-  background: none;
-  color: #a0a0a0a0;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-.delete-button:hover, .delete-button:active  {
-  background: #d0d0d0a0;
-  color: #0000ffff;
 }
 

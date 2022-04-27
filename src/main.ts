@@ -1,21 +1,15 @@
 import 'normalize.css'
 import './style.css'
-import {
-  ListItem,
-  getItem,
-  deleteItem,
-  addItem,
-  updateItem,
-} from './shopping-list'
+import { ListItem, createItemsStore } from './shopping-list'
 import { save, load } from './storage'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
-let items: ListItem[] = []
-let addText: HTMLInputElement
+let inputText: HTMLInputElement
+let store: ReturnType<typeof createItemsStore>
 
 function addItemForm() {
   return `<form class="add-form">
-    <input type="text" />
+    <input type="text" maxlength="40" />
     <button type="submit" class="add-button">+</button>
   </form>`
 }
@@ -24,14 +18,20 @@ function deleteButton(id: ListItem['id']) {
   return `<button class="delete-button" data-id="${id}">✖️</button>`
 }
 
+function dateStr(d?: Date) {
+  if (!d) return ''
+  return `${d.getMonth() + 1}/${d.getDate()}`
+}
+
 function listItem(i: ListItem) {
   return `<li class="list-item ${i.done ? 'done' : ''}"  data-id="${i.id}">
-  <span>📌 ${i.name} ${i.done ? '✔️' : ''}</span>
+  <span class="name">📌 ${i.name} ${i.done ? '✔️' : ''}</span>
+  <span class="doneat">${dateStr(i.doneAt)}</span>
   ${deleteButton(i.id)}
 </li>`
 }
 
-function render() {
+function render(items: ListItem[]) {
   app.innerHTML = `
     <ul class="list">
       ${items.map((i) => listItem(i)).join('')}
@@ -39,29 +39,24 @@ function render() {
     ${addItemForm()}
   `
 
-  addText = document.querySelector('.add-form input[type=text]')!
+  inputText = document.querySelector('.add-form input[type=text]')!
 }
 
 async function onListItemClick(el: HTMLElement) {
   const id = el.dataset['id']
   if (!id) return
-  const item = getItem(items, id)
+  const item = store.get(id)
   if (!item) return
-  items = updateItem(items, id, { done: !item.done })
-  render()
-  await save(items)
+  store.update(id, { done: !item.done })
 }
 
 async function onAddButtonClick(ev: Event) {
   ev.preventDefault()
-  const txt = addText.value
-  const newItems = addItem(items, txt)
-  if (newItems === items) return
-  items = newItems
-  addText.value = ''
-  render()
-  await save(items)
-  addText.focus()
+  const txt = inputText.value
+  if (store.add(txt)) {
+    inputText.value = ''
+  }
+  inputText.focus()
 }
 
 async function onDeleteButtonClick(ev: Event, el: HTMLElement) {
@@ -69,9 +64,7 @@ async function onDeleteButtonClick(ev: Event, el: HTMLElement) {
   ev.stopPropagation()
   const id = el.dataset['id']
   if (!id) return
-  items = deleteItem(items, id)
-  render()
-  await save(items)
+  store.delete(id)
 }
 
 function addHandlers() {
@@ -93,9 +86,12 @@ function addHandlers() {
 addHandlers()
 
 load()
-  .then((loadedItems) => {
-    items = loadedItems
-    render()
+  .then((initialItems: ListItem[]) => {
+    store = createItemsStore(initialItems, async (items: ListItem[]) => {
+      render(items)
+      await save(items)
+    })
+    render(initialItems)
   })
   .catch((err) => {
     console.error(err)
