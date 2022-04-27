@@ -16,8 +16,6 @@
     "vite-plugin-pwa": "^0.12.0"
   },
   "dependencies": {
-    "node": "latest",
-    "normalize.css": "^8.0.1",
-    "npm": "latest"
+    "normalize.css": "^8.0.1"
   }
 }
