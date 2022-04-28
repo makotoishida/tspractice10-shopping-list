@@ -1,21 +1,22 @@
+import { html, render } from 'lit-html'
 import 'normalize.css'
 import './style.css'
 import { ListItem, createItemsStore } from './shopping-list'
 import { save, load } from './storage'
 
-const app = document.querySelector<HTMLDivElement>('#app')!
+const appRoot = document.querySelector<HTMLDivElement>('#app')!
 let inputText: HTMLInputElement
 let store: ReturnType<typeof createItemsStore>
 
 function addItemForm() {
-  return `<form class="add-form">
+  return html`<form class="add-form">
     <input type="text" maxlength="40" />
     <button type="submit" class="add-button">+</button>
   </form>`
 }
 
 function deleteButton(id: ListItem['id']) {
-  return `<button class="delete-button" data-id="${id}">✖️</button>`
+  return html`<button class="delete-button" data-id="${id}">✖️</button>`
 }
 
 function dateStr(d?: Date) {
@@ -24,21 +25,22 @@ function dateStr(d?: Date) {
 }
 
 function listItem(i: ListItem) {
-  return `<li class="list-item ${i.done ? 'done' : ''}"  data-id="${i.id}">
-  <span class="name">📌 ${i.name} ${i.done ? '✔️' : ''}</span>
-  <span class="doneat">${dateStr(i.doneAt)}</span>
-  ${deleteButton(i.id)}
-</li>`
+  return html`<li class="list-item ${i.done ? 'done' : ''}" data-id="${i.id}">
+    <span class="name">📌 ${i.name} ${i.done ? '✔️' : ''}</span>
+    <span class="doneat">${dateStr(i.doneAt)}</span>
+    ${deleteButton(i.id)}
+  </li>`
 }
 
-function render(items: ListItem[]) {
-  app.innerHTML = `
+function renderApp(items: ListItem[]) {
+  const appTemplate = html`
     <ul class="list">
-      ${items.map((i) => listItem(i)).join('')}
+      ${items.map((i) => listItem(i))}
     </ul>
     ${addItemForm()}
   `
 
+  render(appTemplate, appRoot)
   inputText = document.querySelector('.add-form input[type=text]')!
 }
 
@@ -88,12 +90,11 @@ addHandlers()
 load()
   .then((initialItems: ListItem[]) => {
     store = createItemsStore(initialItems, async (items: ListItem[]) => {
-      render(items)
+      renderApp(items)
       await save(items)
     })
-    render(initialItems)
+    renderApp(initialItems)
   })
   .catch((err) => {
     console.error(err)
   })
-
